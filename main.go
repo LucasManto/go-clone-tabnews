@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
+	err := godotenv.Load(".env.development")
 	if err != nil {
 		panic(err)
 	}
