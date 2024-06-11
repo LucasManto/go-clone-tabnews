@@ -1,5 +1,5 @@
 run-watch:
-	@gow run main.go
+	@gow run .
 
 test-watch:
 	@gow test ./...
