@@ -15,6 +15,8 @@ func main() {
 		panic(err)
 	}
 
+	log.SetFlags(log.LstdFlags | log.LUTC | log.Llongfile)
+
 	fileServer := http.FileServer(http.Dir("./pages"))
 	http.Handle("/", fileServer)
 
