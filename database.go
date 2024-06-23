@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func query(ctx context.Context, sql string, dest any) error {
+func query(ctx context.Context, sql string, args ...any) ([]map[string]any, error) {
 	sb := strings.Builder{}
 	sb.WriteString("host=" + os.Getenv("POSTGRES_HOST"))
 	sb.WriteString(" port=" + os.Getenv("POSTGRES_PORT"))
@@ -19,9 +19,14 @@ func query(ctx context.Context, sql string, dest any) error {
 
 	conn, err := pgx.Connect(ctx, connString)
 	if err != nil {
-		return err
+		return nil, err
+	}
+
+	rows, err := conn.Query(ctx, sql, args...)
+	if err != nil {
+		return nil, err
 	}
 	defer conn.Close(ctx)
 
-	return conn.QueryRow(ctx, sql).Scan(dest)
+	return pgx.CollectRows(rows, pgx.RowToMap)
 }
