@@ -1,30 +1,27 @@
 package main
 
 import (
+	"context"
 	"os"
-	"strconv"
+	"strings"
 
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v5"
 )
 
-func Query(sql string, dest any) error {
-	portEnvVarValue := os.Getenv("POSTGRES_PORT")
-	port, err := strconv.Atoi(portEnvVarValue)
+func Query(ctx context.Context, sql string, dest any) error {
+	sb := strings.Builder{}
+	sb.WriteString("host=" + os.Getenv("POSTGRES_HOST"))
+	sb.WriteString(" port=" + os.Getenv("POSTGRES_PORT"))
+	sb.WriteString(" user=" + os.Getenv("POSTGRES_USER"))
+	sb.WriteString(" password=" + os.Getenv("POSTGRES_PASSWORD"))
+	sb.WriteString(" dbname=" + os.Getenv("POSTGRES_DB"))
+	connString := sb.String()
+
+	conn, err := pgx.Connect(ctx, connString)
 	if err != nil {
 		return err
 	}
+	defer conn.Close(ctx)
 
-	conn, err := pgx.Connect(pgx.ConnConfig{
-		Host:     os.Getenv("POSTGRES_HOST"),
-		Port:     uint16(port),
-		User:     os.Getenv("POSTGRES_USER"),
-		Database: os.Getenv("POSTGRES_DB"),
-		Password: os.Getenv("POSTGRES_PASSWORD"),
-	})
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	return conn.QueryRow(sql).Scan(dest)
+	return conn.QueryRow(ctx, sql).Scan(dest)
 }

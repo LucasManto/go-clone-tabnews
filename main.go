@@ -22,7 +22,7 @@ func main() {
 
 	http.Handle("/api/v1/status", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var response int
-		err := Query("SELECT 1 + 1 as SUM;", &response)
+		err := Query(r.Context(), "SELECT 1 + 1 as SUM;", &response)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
