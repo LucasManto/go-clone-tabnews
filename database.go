@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func Query(ctx context.Context, sql string, dest any) error {
+func query(ctx context.Context, sql string, dest any) error {
 	sb := strings.Builder{}
 	sb.WriteString("host=" + os.Getenv("POSTGRES_HOST"))
 	sb.WriteString(" port=" + os.Getenv("POSTGRES_PORT"))
