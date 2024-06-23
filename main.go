@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -20,20 +19,7 @@ func main() {
 	fileServer := http.FileServer(http.Dir("./pages"))
 	http.Handle("/", fileServer)
 
-	http.Handle("/api/v1/status", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var response int
-		err := query(r.Context(), "SELECT 1 + 1 as SUM;", &response)
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]any{"key": "error"})
-			return
-		}
-		log.Println(response)
-
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]any{"key": "são acima da média"})
-	}))
+	http.Handle("/api/v1/status", http.HandlerFunc(status))
 
 	fmt.Println("Server running on port 8080")
 	err = http.ListenAndServe(":8080", nil)
